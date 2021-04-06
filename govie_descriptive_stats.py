@@ -15,6 +15,9 @@ from tkinter.ttk import *
 import pandas as pd
 import numpy as np
 import xlsxwriter
+import json
+
+
   
 #get ask oppenfile
 from tkinter.filedialog import askopenfile
@@ -53,25 +56,32 @@ def open_file():
     
     #csv file
     file = askopenfile(mode ='rb+', filetypes =[('CSV Files', '*.csv'),('JSON Files', '*.json')])
-    df = pd.read_csv(file)
+    filetype = os.path.splitext(file.name)
     
-    if file is not None:
-        print(df.info())
+    #check filetype
+    if filetype[1] == '.csv' :
+      df = pd.read_csv(file)
+    
+      if file is not None:
+         print(df.info())
     
     
-        # Ask user for the name of the file they would like to save:
-        root2 = Tk()
-        root2.geometry('600x300')
-        root2.title("Save File")
-       # root2.title('Your file will now be exported to Excel to the following directory '+ folder_selected + ', please insert a name for it below:')
+            # Ask user for the name of the file they would like to save:
+         root2 = Tk()
+         root2.geometry('600x300')
+         root2.title("Save File")
+         #root2.title('Your file will now be exported to Excel to the following directory '+ folder_selected + ', please insert a name for it below:')
 
-        e = Entry(root2)
-        e.pack()
-        e.focus_set()
+         e = Entry(root2)
+         e.pack()
+         e.focus_set()
 
-        b = Button(root2,text='Save File',command=lambda:save_file(e.get(), df))
-        b.pack(side='bottom')
-        root.mainloop()
+         b = Button(root2,text='Save File',command=lambda:save_file(e.get(), df))
+         b.pack(side='bottom')
+         root.mainloop()
+         
+    else:
+         print("Yeehaw")
        
 
 #set working directory button
