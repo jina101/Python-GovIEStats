@@ -7,7 +7,7 @@ Created on Wed Mar 31 12:11:06 2021
 
 
 
-#importing all relevant modules from Tkinter, pandas, os and numpy
+#importing all relevant modules from Tkinter, pandas, os and numpy, xlsxwriter, json etc
 import os
 import io
 from tkinter import * 
@@ -17,14 +17,17 @@ import numpy as np
 import xlsxwriter
 import json
 
-
+#!git add "govie_descriptive_stats.py.py"
+#!git commit -m "My commit"
+#!git push origin master
   
 #get ask oppenfile
 from tkinter.filedialog import askopenfile
  
 #set up a Tk winddow  
 root = Tk()
-root.geometry('200x200')
+root.geometry('500x150')
+root.title("Open a CSV, JSON, JSON-Stat File or Set Working Directory")
 
 #working directory is the current wd, if not chosen
 folder_selected = os.getcwd()
@@ -47,6 +50,24 @@ def save_file(name, dataframe):
     writer.save()
     print("An excel file has been saved in the following directory: " + folder_selected)
   
+#gui for saving a file
+def save_file_dialogue():
+      global e
+      global df
+     
+    # Ask user for the name of the file they would like to save:
+      root2 = Tk()
+      root2.geometry('600x300')
+      root2.title("Save File")
+      #root2.title('Your file will now be exported to Excel to the following directory '+ folder_selected + ', please insert a name for it below:')
+
+      e = Entry(root2)
+      e.pack()
+      e.focus_set()
+
+      b = Button(root2,text='Save File',command=lambda:save_file(e.get(), df))
+      b.pack(side='bottom')
+      root2.mainloop()
   
 #function to open files and put them into a dataframe
 #the files that will open are csv JSON and JSON-Stat
@@ -55,33 +76,27 @@ def open_file():
     global df
     
     #csv file
-    file = askopenfile(mode ='rb+', filetypes =[('CSV Files', '*.csv'),('JSON Files', '*.json')])
+    file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
     filetype = os.path.splitext(file.name)
     
     #check filetype
-    if filetype[1] == '.csv' :
+    if file is not None and filetype[1].lower() == '.csv':
       df = pd.read_csv(file)
+      print(df.info())
+      save_file_dialogue()
     
-      if file is not None:
-         print(df.info())
-    
-    
-            # Ask user for the name of the file they would like to save:
-         root2 = Tk()
-         root2.geometry('600x300')
-         root2.title("Save File")
-         #root2.title('Your file will now be exported to Excel to the following directory '+ folder_selected + ', please insert a name for it below:')
-
-         e = Entry(root2)
-         e.pack()
-         e.focus_set()
-
-         b = Button(root2,text='Save File',command=lambda:save_file(e.get(), df))
-         b.pack(side='bottom')
-         root.mainloop()
-         
+   
+    elif file is not None and (filetype[1].lower() == '.txt' or filetype[1].lower() == '.json') :
+      data = json.load(file)
+      print(data)
+      type(data)
+      #df = pd.DataFrame.from_dict(data, orient='index')
+      #print(df.info())
+      #print(df.head(5))
+      save_file_dialogue()
+     
     else:
-         print("Yeehaw")
+        print("Yeehaw")
        
 
 #set working directory button
