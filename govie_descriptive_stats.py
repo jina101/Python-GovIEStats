@@ -15,9 +15,9 @@ from tkinter.ttk import *
 import pandas as pd
 import numpy as np
 import xlsxwriter
-import json
+import json as jsn
 
-#!git add "govie_descriptive_stats.py.py"
+#!git add "govie_descriptive_stats.py"
 #!git commit -m "My commit"
 #!git push origin master
   
@@ -87,12 +87,12 @@ def open_file():
     
    
     elif file is not None and (filetype[1].lower() == '.txt' or filetype[1].lower() == '.json') :
-      data = json.load(file)
-      print(data)
-      type(data)
-      #df = pd.DataFrame.from_dict(data, orient='index')
-      #print(df.info())
-      #print(df.head(5))
+      data = jsn.loads(file.read().decode('utf-8'))
+      data['fields']
+
+      df = pd.DataFrame.from_dict(data['fields'], orient='columns')
+      print(df.info())
+      print(df.head(5))
       save_file_dialogue()
      
     else:
