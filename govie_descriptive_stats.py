@@ -16,6 +16,8 @@ import pandas as pd
 import numpy as np
 import xlsxwriter
 import json as jsn
+from pyjstat import pyjstat
+
 
 #!git add "govie_descriptive_stats.py"
 #!git commit -m "My commit"
@@ -86,17 +88,22 @@ def open_file():
       save_file_dialogue()
     
    
-    elif file is not None and (filetype[1].lower() == '.txt' or filetype[1].lower() == '.json') :
+    elif file is not None and filetype[1].lower() == '.json' :
       data = jsn.loads(file.read().decode('utf-8'))
-      data['fields']
+      
 
-      df = pd.DataFrame.from_dict(data['fields'], orient='columns')
+      #might have an if statement here to see if the JSON has fields and features
+      df = pd.json_normalize(data['features'])
       print(df.info())
       print(df.head(5))
       save_file_dialogue()
      
     else:
-        print("Yeehaw")
+        data = pyjstat.Dataset.read(file)
+        df = data.write('dataframe')
+        print(df.info())
+        save_file_dialogue()
+
        
 
 #set working directory button
