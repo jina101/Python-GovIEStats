@@ -43,7 +43,8 @@ def set_directory():
         folder = filedialog.askdirectory()
         os.chdir(folder)
         print("The current working directory is " + folder)
-    except Exception as error:
+        folder_selected = folder
+    except Exception:
         os.chdir(folder_selected)
         print("The current working directory is " + folder_selected)
 
@@ -60,7 +61,7 @@ def save_file(name, dataframe):
         print("An excel file has been saved in the following directory: " + folder_selected)
     
     except Exception as error:
-         print(f'Unable to name file. An error occured: <{error}>')
+         print(f'Unable to name file. An error occured: <{error}> Please exit and try again.')
          exit()
   
 #function + gui for saving a file
@@ -95,35 +96,42 @@ def open_file():
         file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
         filetype = os.path.splitext(file.name)
         
-            #check filetype
-        if file is not None and filetype[1].lower() == '.csv':
-            df = pd.read_csv(file)
-            print(df.info())
-            save_file_dialogue()
-    
-   
-        elif file is not None and filetype[1].lower() == '.json' :
-            data = jsn.loads(file.read().decode('utf-8'))
+        if filetype[1].lower() != '.csv':
+        #json files
+            try:
+                data = jsn.loads(file.read().decode('utf-8'))
       
 
   #might have an if statement here to see if the JSON has fields and features
-            df = pd.json_normalize(data['features'])
-            print(df.info())
-            print(df.head(5))
-            save_file_dialogue()
-     
-        else:
-            data = pyjstat.Dataset.read(file)
-            df = data.write('dataframe')
-            print(df.info())
-            save_file_dialogue()
+                df = pd.json_normalize(data['features'])
+                print(df.info())
+                print(df.head(5))
+                save_file_dialogue()
+            
     
+        #json-stat files
+            except Exception:
+                data = pyjstat.Dataset.read(file).decode('utf-8')
+                df = data.write('dataframe')
+                print(df.info())
+                save_file_dialogue()
+     
+        #csv
+        else:
+            try:
+                df = pd.read_csv(file)
+                print(df.info())
+                save_file_dialogue()    
+            except Exception:
+                print("Sorry, this file cannot be opened.")
+
+
     
     except(OSError,FileNotFoundError):
-        print(f'Unable to find or open <{file}>')
+        print(f'Unable to find or open <{file}> Please exit and try again.')
         exit()
     except Exception as error:
-        print(f'An error has occurred: <{error}>')
+        print(f'An error has occurred: <{error}> Please exit and try again.')
         exit()
     
     
