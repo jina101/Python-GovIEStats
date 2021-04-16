@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Mar 31 12:11:06 2021
-
 @author: ranja
 """
 
@@ -96,34 +95,36 @@ def open_file():
         file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
         filetype = os.path.splitext(file.name)
         
-        if filetype[1].lower() != '.csv':
+        if file is not None and filetype[1].lower() != '.csv':
         #json files
             try:
                 data = jsn.loads(file.read().decode('utf-8'))
-      
-
   #might have an if statement here to see if the JSON has fields and features
                 df = pd.json_normalize(data['features'])
                 print(df.info())
                 print(df.head(5))
                 save_file_dialogue()
+            except:
+                pass
             
-    
-        #json-stat files
-            except Exception:
-                data = pyjstat.Dataset.read(file).decode('utf-8')
+            #json-stat files
+            try:
+                data = pyjstat.Dataset.read(file)
                 df = data.write('dataframe')
-                print(df.info())
                 save_file_dialogue()
+            except Exception as err:
+                print(f'An error has occurred: <{err}>')
+                exit()
+                
      
         #csv
         else:
             try:
-                df = pd.read_csv(file)
+                df = pd.read_csv(file, encoding='utf-8')
                 print(df.info())
                 save_file_dialogue()    
-            except Exception:
-                print("Sorry, this file cannot be opened.")
+            except Exception as e:
+                print(f'An error has occurred: <{e}>')
 
 
     
