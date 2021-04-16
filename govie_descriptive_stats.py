@@ -15,9 +15,12 @@ from tkinter.ttk import *
 import pandas as pd
 import numpy as np
 import xlsxwriter
-import json
+import json as jsn
+from pyjstat import pyjstat
+from sys import exit
 
-#!git add "govie_descriptive_stats.py.py"
+
+#!git add "govie_descriptive_stats.py"
 #!git commit -m "My commit"
 #!git push origin master
   
@@ -76,27 +79,43 @@ def open_file():
     global df
     
     #csv file
-    file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
-    filetype = os.path.splitext(file.name)
-    
-    #check filetype
-    if file is not None and filetype[1].lower() == '.csv':
-      df = pd.read_csv(file)
-      print(df.info())
-      save_file_dialogue()
+    try:
+        file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
+        filetype = os.path.splitext(file.name)
+        
+            #check filetype
+        if file is not None and filetype[1].lower() == '.csv':
+            df = pd.read_csv(file)
+            print(df.info())
+            save_file_dialogue()
     
    
-    elif file is not None and (filetype[1].lower() == '.txt' or filetype[1].lower() == '.json') :
-      data = json.load(file)
-      print(data)
-      type(data)
-      #df = pd.DataFrame.from_dict(data, orient='index')
-      #print(df.info())
-      #print(df.head(5))
-      save_file_dialogue()
+        elif file is not None and filetype[1].lower() == '.json' :
+            data = jsn.loads(file.read().decode('utf-8'))
+      
+
+  #might have an if statement here to see if the JSON has fields and features
+            df = pd.json_normalize(data['features'])
+            print(df.info())
+            print(df.head(5))
+            save_file_dialogue()
      
-    else:
-        print("Yeehaw")
+        else:
+            data = pyjstat.Dataset.read(file)
+            df = data.write('dataframe')
+            print(df.info())
+            save_file_dialogue()
+    
+    
+    except(OSError,FileNotFoundError):
+        print(f'Unable to find or open <{file}>')
+        exit()
+    except Exception as error:
+        print(f'An error has occurred: <{error}>')
+        exit()
+    
+    
+        
        
 
 #set working directory button
