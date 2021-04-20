@@ -17,6 +17,7 @@ import xlsxwriter
 import json as jsn
 from pyjstat import pyjstat
 from sys import exit
+import tkinter.filedialog
 
 
 #!git add "govie_descriptive_stats.py"
@@ -92,36 +93,43 @@ def open_file():
     
     #csv file
     try:
-        file = askopenfile(mode ='rb+', filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
-        filetype = os.path.splitext(file.name)
-        
-        if file is not None and filetype[1].lower() != '.csv':
-        #json files
+        file = tkinter.filedialog.askopenfilename(initialdir = "/", filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
+
+        if file is not None and file.lower().endswith(('.json', '.txt')):
+        #json-stat files
             try:
-                data = jsn.loads(file.read().decode('utf-8'))
-  #might have an if statement here to see if the JSON has fields and features
-                df = pd.json_normalize(data['features'])
+                f = open(file)
+                filepath = f.read()
+                data = pyjstat.Dataset.read(filepath)
+                df = data.write('dataframe')
                 print(df.info())
                 print(df.head(5))
                 save_file_dialogue()
             except:
                 pass
             
-            #json-stat files
+                
+            #json files   
             try:
-                data = pyjstat.Dataset.read(file)
-                df = data.write('dataframe')
+                f = open(file)
+                filepath = f.read()
+                data = jsn.loads(filepath)
+  #might have an if statement here to see if the JSON has fields and features
+                df = pd.json_normalize(data['features'])
+                print(df.info())
+                print(df.head(5))
                 save_file_dialogue()
             except Exception as err:
                 print(f'An error has occurred: <{err}>')
                 exit()
-                
      
-        #csv
+        #read a csv
         else:
             try:
+
                 df = pd.read_csv(file, encoding='utf-8')
                 print(df.info())
+                print(df.head(5))
                 save_file_dialogue()    
             except Exception as e:
                 print(f'An error has occurred: <{e}>')
@@ -150,5 +158,3 @@ exit_btn = Button(root, text = "Exit", command = root.destroy)
 exit_btn.pack(side = TOP, pady = 10)  
   
 root.mainloop()
-
-    
