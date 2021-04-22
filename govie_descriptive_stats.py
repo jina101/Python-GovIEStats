@@ -20,9 +20,9 @@ from sys import exit
 import tkinter.filedialog
 
 
-#!git add "govie_descriptive_stats.py"
-#!git commit -m "My commit"
-#!git push origin master
+!git add "govie_descriptive_stats.py"
+!git commit -m "My commit"
+!git push origin master
   
 #get ask oppenfile
 from tkinter.filedialog import askopenfile
@@ -81,8 +81,9 @@ def save_file_dialogue():
       e.focus_set()
 
       b = Button(root2,text='Save File',command=lambda:save_file(e.get(), df))
-      b.pack(side='bottom')
-      root2.mainloop()
+      b.pack(side = TOP, pady = 10)
+      eX = Button(root2, text = "Exit", command = root2.destroy)
+      eX.pack(side = TOP, pady = 10) 
           
   
 #function to open files and put them into a dataframe
@@ -96,43 +97,46 @@ def open_file():
         file = tkinter.filedialog.askopenfilename(initialdir = "/", filetypes =(('CSV Files', '*.csv'),('Text Files', '*.txt'),('JSON Files', '*.json')))
 
         if file is not None and file.lower().endswith(('.json', '.txt')):
-        #json-stat files
+            
+                #json-stat files
             try:
                 f = open(file)
                 filepath = f.read()
                 data = pyjstat.Dataset.read(filepath)
                 df = data.write('dataframe')
+                print("Please see descriptive details below:")
                 print(df.info())
                 print(df.head(5))
                 save_file_dialogue()
             except:
                 pass
             
-                
             #json files   
             try:
                 f = open(file)
                 filepath = f.read()
                 data = jsn.loads(filepath)
-  #might have an if statement here to see if the JSON has fields and features
                 df = pd.json_normalize(data['features'])
+                print("Please see descriptive details below:")
                 print(df.info())
                 print(df.head(5))
                 save_file_dialogue()
             except Exception as err:
-                print(f'An error has occurred: <{err}>')
-                exit()
+                print(f'Cannot open file. An error has occurred: <{err}>')
+           
      
         #read a csv
         else:
             try:
 
                 df = pd.read_csv(file, encoding='utf-8')
+                print("Please see descriptive details below:")
                 print(df.info())
                 print(df.head(5))
                 save_file_dialogue()    
             except Exception as e:
-                print(f'An error has occurred: <{e}>')
+                print(f'Cannot open file. An error has occurred: <{e}>')
+                exit()
 
 
     
